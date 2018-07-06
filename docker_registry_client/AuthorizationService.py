@@ -1,12 +1,35 @@
+import json
+import logging
+import os
+
+# import urlparse
+import requests
+from requests.auth import AuthBase
+
 try:
     from urllib.parse import urlsplit
 except ImportError:
     from urlparse import urlsplit
-# import urlparse
-import requests
-import logging
 
 logger = logging.getLogger(__name__)
+
+
+class DockerConfigAuth(AuthBase):
+    def __init__(self, docker_config_path, registry):
+        self.registry = registry
+        self.docker_config_path = docker_config_path
+
+        with open(docker_config_path, 'r') as f:
+            all_tokens = json.load(f)
+
+        self.token_from_config = all_tokens.get('auths', {}).get(registry, {})\
+            .get('auth', None)
+        if self.token_from_config is None:
+            raise Exception("token not found for registry %s in file %s" % (
+                registry, docker_config_path))
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'Basic %s' % self.token_from_config
 
 
 class AuthorizationService(object):
@@ -19,15 +42,29 @@ class AuthorizationService(object):
     authenticate to the registry. Token has to be renew each time we change
     "scope".
     """
+
+    DEFAULT_CONFIG_PATH = os.environ.get('HOME') and os.path.join(
+        os.environ.get('HOME'), '.docker', 'config.json')
+
     def __init__(self, registry, url="", auth=None, verify=False,
-                 api_timeout=None):
+                 api_timeout=None, config_path=None):
         # Registry ip:port
         self.registry = urlsplit(registry).netloc
         # Service url, ip:port
         self.url = url
         # Authentication (user, password) or None. Used by request to do
         # basicauth
-        self.auth = auth
+        if auth is None and self.DEFAULT_CONFIG_PATH:
+            try:
+                self.auth = DockerConfigAuth(
+                    config_path or self.DEFAULT_CONFIG_PATH,
+                    registry
+                )
+            except Exception:
+                self.auth = None
+                raise
+        else:
+            self.auth = auth
         # Timeout for HTTP request
         self.api_timeout = api_timeout
 

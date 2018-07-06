@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 
-from flexmock import flexmock
-from docker_registry_client import _BaseClient
 import json
+
 from requests.exceptions import HTTPError
 from requests.models import Response
 
+from docker_registry_client import _BaseClient
+from flexmock import flexmock
 
 REGISTRY_URL = "https://registry.example.com:5000"
 TEST_NAMESPACE = 'library'
@@ -54,7 +55,7 @@ class MockRegistry(object):
                         tag=TEST_TAG,
                         digest=TEST_MANIFEST_DIGEST)
 
-    def call(self, response_map, url, data=None, headers=None):
+    def call(self, response_map, url, data=None, headers=None, auth=None):
         assert url.startswith(REGISTRY_URL)
         request = self.format(url[len(REGISTRY_URL):])
         try:

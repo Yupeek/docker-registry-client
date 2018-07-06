@@ -1,13 +1,15 @@
-import logging
-from requests import get, put, delete
-from requests.exceptions import HTTPError
 import json
-from .AuthorizationService import AuthorizationService
-from .manifest import sign as sign_manifest
-
+import logging
 # urllib3 throws some ssl warnings with older versions of python
 #   they're probably ok for the registry client to ignore
 import warnings
+
+from requests import delete, get, put
+from requests.exceptions import HTTPError
+
+from .AuthorizationService import AuthorizationService
+from .manifest import sign as sign_manifest
+
 warnings.filterwarnings("ignore")
 
 

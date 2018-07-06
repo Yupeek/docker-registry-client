@@ -2,11 +2,12 @@ from __future__ import absolute_import
 
 import time
 
-import requests
-from requests import exceptions
 import docker
-import pytest
+import requests
 from docker import utils as docker_utils
+from requests import exceptions
+
+import pytest
 
 
 @pytest.fixture(scope='session')

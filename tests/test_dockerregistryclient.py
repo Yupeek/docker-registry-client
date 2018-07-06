@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
+from requests import HTTPError
+
+import pytest
 from docker_registry_client import DockerRegistryClient
 from docker_registry_client.Repository import BaseRepository
-import pytest
-from requests import HTTPError
-from drc_test_utils.mock_registry import (
-    mock_registry, mock_v2_registry, TEST_NAMESPACE, TEST_REPO, TEST_NAME,
-    TEST_TAG,
-)
+from drc_test_utils.mock_registry import (TEST_NAME, TEST_NAMESPACE, TEST_REPO,
+                                          TEST_TAG, mock_registry,
+                                          mock_v2_registry)
 
 
 class TestDockerRegistryClient(object):

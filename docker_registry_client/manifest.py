@@ -1,8 +1,9 @@
 # Extracted from python-dxf (https://git.io/vM0EB) used under license (MIT).
 import base64
+import json
+
 import ecdsa
 import jws
-import json
 
 
 def assign(obj, *objs):
